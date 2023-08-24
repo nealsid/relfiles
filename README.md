@@ -32,10 +32,11 @@ Which are exactly as you might expect based on the specifier name (`%reldir%` is
 
 `%basename%_test.%extension%`
 
-Determining the project root in the general case requires heuristics without some assumptions like version control or a specific project layout, which I prefer to avoid.  It is planned to provide heuristics for:
+Determining the project root in the general case requires heuristics without some assumptions like a specific project layout, which I prefer to avoid.  It is planned to provide heuristics for:
 
 * Java projects
 * By letting the user specify a parent directory for all projects a user has (i.e, I keep git clones on my machine under `/home/nealsid/git`, so the project root for a given file would be one directory under that).
+* By querying for the version control system of the current file and using that info to find the project root
 
 In addition, it's also planned to let the user specify a project root with each call to `relfiles`, in order to enable the user to determine the project root based on the file itself and pass it to us.  If we do not have a project root and have a transformation that requires it, we can just skip that transformation and log a warning. 
 

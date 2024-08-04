@@ -10,7 +10,7 @@
       '((java-mode . (relfiles-parallel-java-tree))
         ;; Have to include trailing / to be consistent with
         ;; default-directory variable.
-        (c++-mode . ("tests/"))))
+        (c++-mode . ("tests/" "../include/" "../../../../../..//usr/include/"))))
 
 (defun relfiles-parallel-java-tree (x)
   (cond ((string-match "/java/" x) (file-name-directory (string-replace "/java/" "/javatests/" x)))
@@ -75,10 +75,13 @@
                                                     (mapcar (lambda (suffix)
                                                               (concat directory-and-base suffix))
                                                             (append suffixes '(""))))
-                                                  ;;; 1. For each search directory, construct a pathname that contains the filename base
-                                                  (mapcar (lambda (directory)
-                                                            (concat directory filename-base))
-                                                          search-directories))))))))
+                                                  ;;; 1. For each search directory, construct a pathname that contains the filename base,
+                                                  ;; filtering out directories that don't exist.
+                                                  (cl-remove-if-not 'identity (mapcar (lambda (directory)
+                                                                                        (if (not (eq (file-attributes directory) nil))
+                                                                                            (concat directory filename-base)
+                                                                                          nil))
+                                                                                      search-directories)))))))))
 
 (defun relfiles (fn)
   )

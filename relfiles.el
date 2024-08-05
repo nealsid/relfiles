@@ -10,7 +10,7 @@
       '((java-mode . (relfiles-parallel-java-tree))
         ;; Have to include trailing / to be consistent with
         ;; default-directory variable.
-        (c++-mode . ("tests/" "../include/" "../../../../../../usr/jjjinclude/"))))
+        (c++-mode . ("tests/" "../include/" "../../../../../../usr/jjjinclude/" "../src/"))))
 
 (defun relfiles-parallel-java-tree (x)
   (cond ((string-match "/java/" x) (file-name-directory (string-replace "/java/" "/javatests/" x)))
@@ -84,5 +84,8 @@
                                                                                                             nil))
                                                                                                         search-directories))))))))))
 
-(defun relfiles (fn)
-  )
+(defun relfiles-visit-related-files (fn)
+  (let* ((related-files (relfiles-for-filename fn))
+         (fn-index (cl-position fn related-files :test 'string-equal-ignore-case)))
+    (message "%s" related-files)
+    (find-file (nth (% (+ 1 fn-index) (length related-files)) related-files))))

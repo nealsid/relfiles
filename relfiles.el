@@ -10,7 +10,7 @@
       '((java-mode . (relfiles-parallel-java-tree))
         ;; Have to include trailing / to be consistent with
         ;; default-directory variable.
-        (c++-mode . ("tests/" "../include/" "../../../../../..//usr/include/"))))
+        (c++-mode . ("tests/" "../include/" "../../../../../../usr/jjjinclude/"))))
 
 (defun relfiles-parallel-java-tree (x)
   (cond ((string-match "/java/" x) (file-name-directory (string-replace "/java/" "/javatests/" x)))
@@ -63,25 +63,26 @@
           (filename-base (relfiles-compute-file-name-base filename))
           (suffixes (alist-get major-mode relfiles-suffixes-alist))
           (extensions (alist-get major-mode relfiles-extensions-alist)))
-      ;; 3. For each pathname in 2, generate a pathname for each extension configured for this major-mode.
-      (flatten-tree (mapcar (lambda (filename-no-extension)
-                              (mapcar (lambda (extension)
-                                        (concat filename-no-extension "." extension))
-                                      extensions))
-                            ;; 2. For each pathname in 1, construct an entry per suffix (plus the empty string to
-                            ;; find files that don't have a suffix).  Flatten the result since the lambda for the
-                            ;; outer mapcar is calling mapcar, which results in a list for each element.
-                            (flatten-tree (mapcar (lambda (directory-and-base)
-                                                    (mapcar (lambda (suffix)
-                                                              (concat directory-and-base suffix))
-                                                            (append suffixes '(""))))
+      ;; 3. For each pathname in 2, generate a pathname for each extension configured for this major-mode and remove ones that do not exist.
+      (cl-remove-if-not 'file-attributes
+                        (flatten-tree (mapcar (lambda (filename-no-extension)
+                                                (mapcar (lambda (extension)
+                                                          (concat filename-no-extension "." extension))
+                                                        extensions))
+                                              ;; 2. For each pathname in 1, construct an entry per suffix (plus the empty string to
+                                              ;; find files that don't have a suffix).  Flatten the result since the lambda for the
+                                              ;; outer mapcar is calling mapcar, which results in a list for each element.
+                                              (flatten-tree (mapcar (lambda (directory-and-base)
+                                                                      (mapcar (lambda (suffix)
+                                                                                (concat directory-and-base suffix))
+                                                                              (append suffixes '(""))))
                                                   ;;; 1. For each search directory, construct a pathname that contains the filename base,
-                                                  ;; filtering out directories that don't exist.
-                                                  (cl-remove-if-not 'identity (mapcar (lambda (directory)
-                                                                                        (if (not (eq (file-attributes directory) nil))
-                                                                                            (concat directory filename-base)
-                                                                                          nil))
-                                                                                      search-directories)))))))))
+                                                                    ;; filtering out directories that don't exist.
+                                                                    (cl-remove-if-not 'identity (mapcar (lambda (directory)
+                                                                                                          (if (not (eq (file-attributes directory) nil))
+                                                                                                              (concat directory filename-base)
+                                                                                                            nil))
+                                                                                                        search-directories))))))))))
 
 (defun relfiles (fn)
   )

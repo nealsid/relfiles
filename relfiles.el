@@ -67,22 +67,26 @@
       (cl-remove-if-not 'file-attributes
                         (delete-dups
                          (mapcar 'expand-file-name
-                                 (flatten-tree (mapcar (lambda (filename-no-extension)
-                                                         (mapcar (lambda (extension)
-                                                                   (concat filename-no-extension "." extension))
+                                 (append-extensions
+                                  (append-suffixes (cl-remove-if-not 'identity
+                                                                     (append-filename-base-to-directories search-directories filename-base))
+                                                   (append suffixes '("")))
+                                  extensions)))))))
+
+(defun append-extensions (filenames-with-suffixes extensions)
+  (flatten-tree (mapcar (lambda (filename-no-extension)
+                          (mapcar (lambda (extension)
+                                    (concat filename-no-extension "." extension))
                                                                  extensions))
-                                                       ;; 2. For each pathname in 1, construct an entry per suffix (plus the empty string to
-                                                       ;; find files that don't have a suffix).  Flatten the result since the lambda for the
-                                                       ;; outer mapcar is calling mapcar, which results in a list for each element.
-                                                       (flatten-tree (mapcar (lambda (directory-and-base)
-                                                                               (mapcar (lambda (suffix)
-                                                                                         (concat directory-and-base suffix))
-                                                                                       (append suffixes '(""))))
-                                                                             ;; 1. For each search directory, construct a pathname that
-                                                                             ;; contains the filename base, filtering out directories that
-                                                                             ;; don't exist.
-                                                                             (cl-remove-if-not 'identity
-                                                                                               (append-filename-base-to-directories search-directories filename-base))))))))))))
+                        filenames-with-suffixes)))
+
+(defun append-suffixes (directories-and-base suffixes)
+  (flatten-tree
+   (mapcar (lambda (directory-and-base)
+             (mapcar (lambda (suffix)
+                       (concat directory-and-base suffix))
+                     suffixes))
+           directories-and-base)))
 
 (defun append-filename-base-to-directories (directories filename-base)
   (mapcar (lambda (directory)

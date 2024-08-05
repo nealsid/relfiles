@@ -55,20 +55,23 @@
                       relfiles-directories)
               (list default-directory)))))
 
-;; It's easiest to read the comments for this function from the
-;; innermost mapcar outward, i.e., scanning up instead of down
 (defun relfiles-for-filename (filename)
   (with-current-buffer (find-file-noselect filename)
     (let ((search-directories (relfiles-compute-search-directories-for-filename filename))
           (filename-base (relfiles-compute-file-name-base filename))
           (suffixes (alist-get major-mode relfiles-suffixes-alist))
           (extensions (alist-get major-mode relfiles-extensions-alist)))
-      ;; 3. For each pathname in 2, generate a pathname for each extension configured for this major-mode and remove ones that do not exist.
+      ;; 6. Remove nonexistent files
       (cl-remove-if-not 'file-attributes
+                        ;; 5. Delete duplicates from the list after canonicalization.
                         (delete-dups
+                         ;; 4. Expand the file name (i.e. canonicalizing filenames to remove .., for instance)
                          (mapcar 'expand-file-name
+                                 ;; 3. Append extensions to each list item from 2
                                  (append-extensions
+                                  ;; 2. Remove any nil entries (signifying directories that don't exist) and then append suffixes to each item from 1.
                                   (append-suffixes (cl-remove-if-not 'identity
+                                                                     ;; 1. Append the filename base to the search directories
                                                                      (append-filename-base-to-directories search-directories filename-base))
                                                    (append suffixes '("")))
                                   extensions)))))))
@@ -96,6 +99,7 @@
           directories))
 
 (defun relfiles-visit-related-files (fn)
+  (interactive)
   (let* ((related-files (relfiles-for-filename fn))
          (fn-index (cl-position fn related-files :test 'string-equal-ignore-case)))
     (message "%s" related-files)

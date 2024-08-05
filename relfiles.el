@@ -65,24 +65,26 @@
           (extensions (alist-get major-mode relfiles-extensions-alist)))
       ;; 3. For each pathname in 2, generate a pathname for each extension configured for this major-mode and remove ones that do not exist.
       (cl-remove-if-not 'file-attributes
-                        (flatten-tree (mapcar (lambda (filename-no-extension)
-                                                (mapcar (lambda (extension)
-                                                          (concat filename-no-extension "." extension))
-                                                        extensions))
-                                              ;; 2. For each pathname in 1, construct an entry per suffix (plus the empty string to
-                                              ;; find files that don't have a suffix).  Flatten the result since the lambda for the
-                                              ;; outer mapcar is calling mapcar, which results in a list for each element.
-                                              (flatten-tree (mapcar (lambda (directory-and-base)
-                                                                      (mapcar (lambda (suffix)
-                                                                                (concat directory-and-base suffix))
-                                                                              (append suffixes '(""))))
+                        (delete-dups
+                         (mapcar 'expand-file-name
+                                 (flatten-tree (mapcar (lambda (filename-no-extension)
+                                                         (mapcar (lambda (extension)
+                                                                   (concat filename-no-extension "." extension))
+                                                                 extensions))
+                                                       ;; 2. For each pathname in 1, construct an entry per suffix (plus the empty string to
+                                                       ;; find files that don't have a suffix).  Flatten the result since the lambda for the
+                                                       ;; outer mapcar is calling mapcar, which results in a list for each element.
+                                                       (flatten-tree (mapcar (lambda (directory-and-base)
+                                                                               (mapcar (lambda (suffix)
+                                                                                         (concat directory-and-base suffix))
+                                                                                       (append suffixes '(""))))
                                                   ;;; 1. For each search directory, construct a pathname that contains the filename base,
-                                                                    ;; filtering out directories that don't exist.
-                                                                    (cl-remove-if-not 'identity (mapcar (lambda (directory)
-                                                                                                          (if (not (eq (file-attributes directory) nil))
-                                                                                                              (concat directory filename-base)
-                                                                                                            nil))
-                                                                                                        search-directories))))))))))
+                                                                             ;; filtering out directories that don't exist.
+                                                                             (cl-remove-if-not 'identity (mapcar (lambda (directory)
+                                                                                                                   (if (not (eq (file-attributes directory) nil))
+                                                                                                                       (concat directory filename-base)
+                                                                                                                     nil))
+                                                                                                                 search-directories))))))))))))
 
 (defun relfiles-visit-related-files (fn)
   (let* ((related-files (relfiles-for-filename fn))

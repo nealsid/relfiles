@@ -12,6 +12,12 @@
         ;; default-directory variable.
         (c++-mode . ("../test/" "../include/" "../src/"))))
 
+(defmacro log-and-return (x)
+  `(progn
+     (let ((return-value ,x))
+       (message "nealsid: %s" return-value)
+       return-value)))
+
 (defun relfiles-parallel-java-tree (x)
   (cond ((string-match "/java/" x) (file-name-directory (string-replace "/java/" "/javatests/" x)))
         ((string-match "/javatests/" x) (file-name-directory (string-replace "/javatests/" "/java/" x)))
@@ -68,13 +74,14 @@
                          ;; 4. Expand the file name (i.e. canonicalizing filenames to remove .., for instance)
                          (mapcar 'expand-file-name
                                  ;; 3. Append extensions to each list item from 2
-                                 (append-extensions
-                                  ;; 2. Remove any nil entries (signifying directories that don't exist) and then append suffixes to each item from 1.
-                                  (append-suffixes (cl-remove-if-not 'identity
-                                                                     ;; 1. Append the filename base to the search directories
-                                                                     (append-filename-base-to-directories search-directories filename-base))
-                                                   (append suffixes '("")))
-                                  extensions)))))))
+                                 (log-and-return
+                                  (append-extensions
+                                   ;; 2. Remove any nil entries (signifying directories that don't exist) and then append suffixes to each item from 1.
+                                   (append-suffixes (cl-remove-if-not 'identity
+                                                                      ;; 1. Append the filename base to the search directories
+                                                                      (append-filename-base-to-directories search-directories filename-base))
+                                                    (append suffixes '("")))
+                                   extensions))))))))
 
 (defun append-extensions (filenames-with-suffixes extensions)
   (flatten-tree (mapcar (lambda (filename-no-extension)

@@ -6,6 +6,6 @@ We aren't implementing anything related to transforms any longer.
 Customizing related files for specific projects regardless of the major mode is important, and can be done with directory-local variables.
 * TODO Add unit tests                                                   :ENG:
 * TODO Package as melpa package                                         :ENG:
-* TODO Implement customization of relfiles state, such as suffixes or directories, without overriding default configuration
-** TODO Add new variables that are appended to default configuration before filenames are constructed.
+* TODO Implement customization of relfiles state, such as suffixes or directories, without overriding default configuration :ENG:
+** TODO Add new variables that are appended to default configuration before filenames are constructed. :ENG:
 * DONE Add debugging macro to log and return expressions.               :ENG:

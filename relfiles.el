@@ -1,5 +1,5 @@
 (defvar-local relfiles-suffixes-alist
-          '((java-mode . ("test" "model"))
+          '((java-mode . ("Test" "Model"))
             (c++-mode . ("_test"))
             (c-mode . ("_test"))))
 
@@ -21,8 +21,8 @@
        return-value)))
 
 (defun relfiles-parallel-java-tree (x)
-  (cond ((string-match "/java/" x) (file-name-directory (string-replace "/java/" "/javatests/" x)))
-        ((string-match "/javatests/" x) (file-name-directory (string-replace "/javatests/" "/java/" x)))
+  (cond ((string-match "/src/main/" x) (file-name-directory (string-replace "/src/main/" "/src/test/" x)))
+        ((string-match "/src/test/" x) (file-name-directory (string-replace "/src/test/" "/src/main/" x)))
         (x)))
 
 (defun relfiles-compute-file-name-base (filename)

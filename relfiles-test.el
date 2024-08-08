@@ -10,7 +10,7 @@ unique project directory for the test case."
      (kill-buffer ,buffer-or-name)))
 
 (ert-deftest related-files-same-directory-c++ ()
-  "Opens a project with one file"
+  "Test related files in the same directory in C++ mode"
   (with-test-directory
    project-dir
    (let* ((query-about-changed-file nil) ;; We touch the files after
@@ -34,5 +34,31 @@ unique project directory for the test case."
       (should (eq (current-buffer) header-file-buffer))
       (relfiles-visit-related-files (buffer-file-name))
       (should (eq (current-buffer) test-file-buffer))
+      (relfiles-visit-related-files (buffer-file-name))
+      (should (eq (current-buffer) dev-file-buffer))
       (kill-buffer header-file-buffer)
+      (kill-buffer test-file-buffer)))))
+
+(ert-deftest related-files-java ()
+  "Test related files in Java mode"
+  (with-test-directory
+   project-dir
+   (let* ((query-about-changed-file nil) ;; We touch the files after
+                                         ;; initially visiting them,
+                                         ;; so make sure Emacs doesn't
+                                         ;; ask about reverting the
+                                         ;; buffer when visiting them
+                                         ;; again later on
+          (development-file (concat project-dir "src/main/java/com/package/Main.java"))
+          (test-file (concat project-dir "src/test/java/com/package/MainTest.java"))
+          (test-file-buffer (find-file-noselect test-file t))
+          (dev-file-buffer (find-file-noselect development-file t)))
+     (make-empty-file development-file t)
+     (make-empty-file test-file t)
+
+     (with-current-buffer-close dev-file-buffer
+      (relfiles-visit-related-files (buffer-file-name))
+      (should (eq (current-buffer) test-file-buffer))
+      (relfiles-visit-related-files (buffer-file-name))
+      (should (eq (current-buffer) dev-file-buffer))
       (kill-buffer test-file-buffer)))))

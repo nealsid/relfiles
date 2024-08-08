@@ -14,11 +14,15 @@ unique project directory for the test case."
   "Opens a project with one file"
   (with-project-and-directory
    project-dir
-   (let ((development-file (concat project-dir "main.cpp"))
+   (let ((header-file (concat project-dir "main.h"))
+         (development-file (concat project-dir "main.cpp"))
          (test-file (concat project-dir "main_test.cpp")))
+     (make-empty-file header-file)
+     (make-empty-file development-file)
+     (make-empty-file test-file)
      (with-current-buffer-close
       (find-file-noselect development-file)
-      (make-empty-file development-file)
-      (make-empty-file test-file)
+      (relfiles-visit-related-files (buffer-file-name))
+      (should (eq (current-buffer) (get-file-buffer header-file)))
       (relfiles-visit-related-files (buffer-file-name))
       (should (eq (current-buffer) (get-file-buffer test-file)))))))

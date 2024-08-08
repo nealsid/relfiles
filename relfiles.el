@@ -1,10 +1,12 @@
 (defvar-local relfiles-suffixes-alist
           '((java-mode . ("test" "model"))
-            (c++-mode . ("_test"))))
+            (c++-mode . ("_test"))
+            (c-mode . ("_test"))))
 
 (defvar-local relfiles-extensions-alist
       '((java-mode . ("java"))
-        (c++-mode . ("cc" "cpp" "cxx" "c" "h" "hpp" "hxx"))))
+        (c++-mode . ("cc" "cpp" "cxx" "c" "h" "hpp" "hxx"))
+        (c-mode . ("cc" "cpp" "cxx" "c" "h" "hpp" "hxx"))))
 
 (defvar-local relfiles-search-directories-alist
       '((java-mode . (relfiles-parallel-java-tree))
@@ -77,10 +79,11 @@
                                  (log-and-return
                                   (append-extensions
                                    ;; 2. Remove any nil entries (signifying directories that don't exist) and then append suffixes to each item from 1.
-                                   (append-suffixes (cl-remove-if-not 'identity
-                                                                      ;; 1. Append the filename base to the search directories
-                                                                      (append-filename-base-to-directories search-directories filename-base))
-                                                    (append suffixes '("")))
+                                   (log-and-return
+                                    (append-suffixes (cl-remove-if-not 'identity
+                                                                       ;; 1. Append the filename base to the search directories
+                                                                       (log-and-return (append-filename-base-to-directories search-directories filename-base)))
+                                                     (append suffixes '(""))))
                                    extensions))))))))
 
 (defun append-extensions (filenames-with-suffixes extensions)
@@ -109,5 +112,6 @@
   (interactive)
   (let* ((related-files (relfiles-for-filename fn))
          (fn-index (cl-position fn related-files :test 'string-equal-ignore-case)))
-    (message "%s" related-files)
+    (message "nealsid: %s" related-files)
+    (message "nealsid: %s" fn-index)
     (find-file (nth (% (+ 1 fn-index) (length related-files)) related-files))))

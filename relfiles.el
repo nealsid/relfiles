@@ -1,12 +1,14 @@
 (defvar-local relfiles-suffixes-alist
           '((java-mode . ("Test" "Model"))
             (c++-mode . ("_test"))
-            (c-mode . ("_test"))))
+            (c-mode . ("_test"))
+            (emacs-lisp-mode . ("-test"))))
 
 (defvar-local relfiles-extensions-alist
       '((java-mode . ("java"))
         (c++-mode . ("cc" "cpp" "cxx" "c" "h" "hpp" "hxx"))
-        (c-mode . ("cc" "cpp" "cxx" "c" "h" "hpp" "hxx"))))
+        (c-mode . ("cc" "cpp" "cxx" "c" "h" "hpp" "hxx"))
+        (emacs-lisp-mode . ("el"))))
 
 (defvar-local relfiles-search-directories-alist
       '((java-mode . (relfiles-parallel-java-tree))
@@ -108,10 +110,11 @@
               nil))
           directories))
 
-(defun relfiles-visit-related-files (fn)
-  (interactive)
+(defun relfiles-visit-related-files-for-fn (fn)
   (let* ((related-files (relfiles-for-filename fn))
          (fn-index (cl-position fn related-files :test 'string-equal-ignore-case)))
-    (message "nealsid: %s" related-files)
-    (message "nealsid: %s" fn-index)
     (find-file (nth (% (+ 1 fn-index) (length related-files)) related-files))))
+
+(defun relfiles-visit-related-files ()
+  (interactive)
+  (relfiles-visit-related-files-for-fn (buffer-file-name)))

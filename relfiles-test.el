@@ -29,11 +29,11 @@ unique project directory for the test case."
      (make-empty-file test-file)
 
      (with-current-buffer-close dev-file-buffer
-      (relfiles-visit-related-files (buffer-file-name))
+      (relfiles-visit-related-files-for-fn (buffer-file-name))
       (should (eq (current-buffer) header-file-buffer))
-      (relfiles-visit-related-files (buffer-file-name))
+      (relfiles-visit-related-files-for-fn (buffer-file-name))
       (should (eq (current-buffer) test-file-buffer))
-      (relfiles-visit-related-files (buffer-file-name))
+      (relfiles-visit-related-files-for-fn (buffer-file-name))
       (should (eq (current-buffer) dev-file-buffer))
       (kill-buffer header-file-buffer)
       (kill-buffer test-file-buffer)))))
@@ -56,8 +56,8 @@ unique project directory for the test case."
      (make-empty-file test-file t)
 
      (with-current-buffer-close dev-file-buffer
-      (relfiles-visit-related-files (buffer-file-name))
+      (relfiles-visit-related-files-for-fn (buffer-file-name))
       (should (eq (current-buffer) test-file-buffer))
-      (relfiles-visit-related-files (buffer-file-name))
+      (relfiles-visit-related-files-for-fn (buffer-file-name))
       (should (eq (current-buffer) dev-file-buffer))
       (kill-buffer test-file-buffer)))))

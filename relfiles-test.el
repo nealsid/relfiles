@@ -5,9 +5,8 @@ unique project directory for the test case."
      ,@forms))
 
 (defmacro with-current-buffer-close (buffer-or-name &rest body)
-  `(progn
-     (with-current-buffer ,buffer-or-name ,@body)
-     (kill-buffer ,buffer-or-name)))
+  `(with-current-buffer ,buffer-or-name ,@body)
+  `(kill-buffer ,buffer-or-name))
 
 (ert-deftest related-files-same-directory-c++ ()
   "Test related files in the same directory in C++ mode"

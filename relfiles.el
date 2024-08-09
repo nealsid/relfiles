@@ -2,19 +2,30 @@
           '((java-mode . ("Test" "Model"))
             (c++-mode . ("_test"))
             (c-mode . ("_test"))
-            (emacs-lisp-mode . ("-test"))))
+            (emacs-lisp-mode . ("-test")))
+  "An alist of major mode to a list of filename suffixes.  The
+suffixes are used to determine what filenames are considered
+\"related\" to the current filename.  E.g. for 'c++-mode', a
+filename of 'a_test.cpp' will be considered related to 'a.cpp'
+based on the entries in this alist.")
 
 (defvar-local relfiles-extensions-alist
       '((java-mode . ("java"))
         (c++-mode . ("cc" "cpp" "cxx" "c" "h" "hpp" "hxx"))
         (c-mode . ("cc" "cpp" "cxx" "c" "h" "hpp" "hxx"))
-        (emacs-lisp-mode . ("el"))))
+        (emacs-lisp-mode . ("el")))
+  "An alist of major mode to a list of file extensions.  The list of
+extensions represents what is searched for when creating a list
+of related filenames.")
 
 (defvar-local relfiles-search-directories-alist
       '((java-mode . (relfiles-parallel-java-tree))
         ;; Have to include trailing / to be consistent with
         ;; default-directory variable.
-        (c++-mode . ("../test/" "../include/" "../src/"))))
+        (c++-mode . ("../test/" "../include/" "../src/")))
+  "An alist of major mode to a list of relative pathnames.  The
+pathnames will be searched for files related to the one currently
+being visited.  The current directory is automatically included in the search paths.")
 
 (defmacro log-and-return (x)
   `(progn
@@ -118,3 +129,5 @@
 (defun relfiles-visit-related-files ()
   (interactive)
   (relfiles-visit-related-files-for-fn (buffer-file-name)))
+
+(global-set-key (kbd "C-c r") 'relfiles-visit-related-files)

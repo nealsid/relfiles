@@ -2,7 +2,7 @@ Relfiles -*- mode: org -*-
 
 * DONE Update docs with changes since initial design                    :DOC:
 We aren't implementing anything related to transforms any longer.
-* TODO Add section to docs on using dir local variables                 :DOC:
+* DONE Add section to docs on using dir local variables                 :DOC:
 Customizing related files for specific projects regardless of the major mode is important, and can be done with directory-local variables.
 * DONE Add unit tests                                                   :ENG:
 * TODO Package as melpa package                                         :ENG:

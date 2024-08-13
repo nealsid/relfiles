@@ -35,3 +35,20 @@ and then `delete-dups`.  After this, each file is tested for existence
 and only those which exist are returned as related files for the input
 filename.  In that returned list, the index of the current file is
 determined, and the next element is passed to `find-file`.
+
+# Per-project customization
+
+To accommodate projects with the same major mode but different
+conventions for filenames, the Emacs facility [directory-local
+variables](https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html)
+can be used.  Emacs supports several different ways of specifying
+directory-local variables, including per-major mode.  This overlaps
+with the way relfiles specifies it's configuration, which is also
+per-major mode.
+
+Therefore, per-directory configuration for relfiles should be
+configured inside the directory-locals alist entry for 'nil'.
+Although this is awkward, because the relfiles configuration values are
+alists with entries for each major mode, it helps keep relfiles'
+configuration in one declaration in `.emacs`, rather than in per-mode
+hooks.

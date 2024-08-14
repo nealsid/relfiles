@@ -62,3 +62,29 @@ unique project directory for the test case."
       (relfiles-visit-related-files-for-fn (buffer-file-name))
       (should (eq (current-buffer) dev-file-buffer))
       (kill-buffer test-file-buffer)))))
+
+(ert-deftest related-files-per-c++-directory-config ()
+         "Test related files with a configuration specified by Emacs
+directory local variables"
+         (with-test-directory
+          project-dir
+          (let* ((query-about-changed-file nil)
+                 (header-file (concat project-dir "main.h"))
+                 (development-file (concat project-dir "main.cpp"))
+                 (test-file (concat project-dir "main_test.cpp"))
+                 (tests-file (concat project-dir "main_tests.cpp"))
+                 (dirlocals-file (concat project-dir ".dir-locals.el"))
+                 (directory-local-config "((nil . ((relfiles-suffixes-alist .
+                                ((java-mode . (\"Test\" \"Model\"))
+                                 (c++-mode . (\"_test\"))
+                                 (c-mode . (\"_test\"))
+                                 (emacs-lisp-mode . (\"-test\")))))))"))
+            (with-current-buffer (find-file-noselect dirlocals-file)
+              (insert directory-local-config)
+              (save-buffer))
+;;            (header-file-buffer (find-file-noselect header-file))
+;;            (test-file-buffer (find-file-noselect test-file))
+;;            (dev-file-buffer (find-file-noselect development-file))
+            )
+
+         ))

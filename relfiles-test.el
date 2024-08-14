@@ -68,12 +68,7 @@ unique project directory for the test case."
 directory local variables"
          (with-test-directory
           project-dir
-          (let* ((query-about-changed-file nil)
-                 (header-file (concat project-dir "main.h"))
-                 (development-file (concat project-dir "main.cpp"))
-                 (test-file (concat project-dir "main_test.cpp"))
-                 (tests-file (concat project-dir "main_tests.cpp"))
-                 (dirlocals-file (concat project-dir ".dir-locals.el"))
+          (let* ((dirlocals-file (concat project-dir ".dir-locals.el"))
                  (directory-local-config "((nil . ((relfiles-suffixes-alist .
                                 ((java-mode . (\"Test\" \"Model\"))
                                  (c++-mode . (\"_tests\"))
@@ -88,13 +83,18 @@ directory local variables"
             ;; safe-local-variable-directories set so that Emacs marks
             ;; the directory local variables and values as safe.
             (let* ((safe-local-variable-directories `(,project-dir))
-                   (test-file-buffer (find-file-noselect test-file))
-                   (dev-file-buffer (find-file-noselect development-file))
+                   (query-about-changed-file nil)
+                   (header-file (concat project-dir "main.h"))
+                   (development-file (concat project-dir "main.cpp"))
+                   (test-file (concat project-dir "main_test.cpp"))
+                   (tests-file (concat project-dir "main_tests.cpp"))
                    (header-file-buffer (find-file-noselect header-file))
+                   (dev-file-buffer (find-file-noselect development-file))
+                   (test-file-buffer (find-file-noselect test-file))
                    (tests-file-buffer (find-file-noselect tests-file)))
-              (make-empty-file test-file)
               (make-empty-file header-file)
               (make-empty-file development-file)
+              (make-empty-file test-file)
               (make-empty-file tests-file)
 
               (with-current-buffer-close dev-file-buffer

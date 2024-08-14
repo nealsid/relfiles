@@ -63,7 +63,7 @@ unique project directory for the test case."
       (should (eq (current-buffer) dev-file-buffer))
       (kill-buffer test-file-buffer)))))
 
-(ert-deftest related-files-per-c++-directory-config ()
+(ert-deftest related-files-c++-per-directory-config ()
          "Test related files with a configuration specified by Emacs
 directory local variables"
          (with-test-directory
@@ -76,15 +76,34 @@ directory local variables"
                  (dirlocals-file (concat project-dir ".dir-locals.el"))
                  (directory-local-config "((nil . ((relfiles-suffixes-alist .
                                 ((java-mode . (\"Test\" \"Model\"))
-                                 (c++-mode . (\"_test\"))
-                                 (c-mode . (\"_test\"))
+                                 (c++-mode . (\"_tests\"))
+                                 (c-mode . (\"_tests\"))
                                  (emacs-lisp-mode . (\"-test\")))))))"))
-            (with-current-buffer (find-file-noselect dirlocals-file)
+            ;; Create the directory local variables file
+            (with-current-buffer-close (find-file-noselect dirlocals-file)
               (insert directory-local-config)
               (save-buffer))
-;;            (header-file-buffer (find-file-noselect header-file))
-;;            (test-file-buffer (find-file-noselect test-file))
-;;            (dev-file-buffer (find-file-noselect development-file))
-            )
 
-         ))
+            ;; Open files in our test project, with
+            ;; safe-local-variable-directories set so that Emacs marks
+            ;; the directory local variables and values as safe.
+            (let* ((safe-local-variable-directories `(,project-dir))
+                   (test-file-buffer (find-file-noselect test-file))
+                   (dev-file-buffer (find-file-noselect development-file))
+                   (header-file-buffer (find-file-noselect header-file))
+                   (tests-file-buffer (find-file-noselect tests-file)))
+              (make-empty-file test-file)
+              (make-empty-file header-file)
+              (make-empty-file development-file)
+              (make-empty-file tests-file)
+
+              (with-current-buffer-close dev-file-buffer
+               (relfiles-visit-related-files-for-fn (buffer-file-name))
+               (should (eq (current-buffer) header-file-buffer))
+               (relfiles-visit-related-files-for-fn (buffer-file-name))
+               (should (eq (current-buffer) tests-file-buffer))
+               (relfiles-visit-related-files-for-fn (buffer-file-name))
+               (should (eq (current-buffer) dev-file-buffer))
+               (kill-buffer test-file-buffer)
+               (kill-buffer tests-file-buffer)
+               (kill-buffer header-file-buffer))))))

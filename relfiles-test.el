@@ -9,6 +9,28 @@ unique project directory for the test case."
      (with-current-buffer ,buffer-or-name ,@body)
      (kill-buffer ,buffer-or-name)))
 
+(ert-deftest related-files-no-related-files ()
+  "Test related files when related files don't exist"
+  (with-test-directory
+   project-dir
+   (let* ((query-about-changed-file nil) ;; We touch the files after
+                                         ;; initially visiting them,
+                                         ;; so make sure Emacs doesn't
+                                         ;; ask about reverting the
+                                         ;; buffer when visiting them
+                                         ;; again later on
+          (development-file (concat project-dir "main.cpp"))
+          (development-file-2 (concat project-dir "main_1.cpp"))
+          (dev-file-buffer (find-file-noselect development-file))
+          (dev-file-2-buffer (find-file-noselect development-file-2)))
+     (make-empty-file development-file)
+     (make-empty-file development-file-2)
+
+     (with-current-buffer-close dev-file-buffer
+      (relfiles-visit-related-files-for-fn (buffer-file-name))
+      (should (eq (current-buffer) dev-file-buffer))
+      (kill-buffer dev-file-2-buffer)))))
+
 (ert-deftest related-files-same-directory-c++ ()
   "Test related files in the same directory in C++ mode"
   (with-test-directory
